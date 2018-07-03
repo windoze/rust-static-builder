@@ -1,0 +1,20 @@
+#!/bin/bash
+
+DIR=`dirname $0`
+
+args=()
+
+for arg in "$@"; do
+	if [[ $arg = *"Bdynamic"* ]]; then
+		args+=() # we do not want this arg
+	elif [[ $arg = *"crti.o"* ]]; then
+		args+=("$arg" "$DIR/../lib/gcc/x86_64-linux-musl/6.4.0/crtbegin.o" "-Bstatic")
+	elif [[ $arg = *"crtn.o"* ]]; then
+		args+=("-lstdc++" "-lgcc" "-lc" "$DIR/../lib/gcc/x86_64-linux-musl/6.4.0/crtend.o" "$arg")
+	else
+		args+=("$arg")
+	fi
+done
+#echo "RUNNING WITH ARGS: ${args[@]}"
+$DIR/x86_64-linux-musl-g++ "${args[@]}"
+
