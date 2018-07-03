@@ -11,13 +11,20 @@ ENV PATH=/home/rust/.cargo/bin:/opt/cross/bin:/usr/local/sbin:/usr/local/bin:/us
 # Install rust and musl target
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
-    rustup target add x86_64-unknown-linux-musl && \
-    cargo install rustfmt
+    rustup target add x86_64-unknown-linux-musl
 # HACK: Custom linker wrapper for cargo/rustc with C++ deps
 ADD cargo-g++ /opt/cross/bin
 RUN sudo chmod +x /opt/cross/bin/cargo-g++
 # Set cargo default target and parameters
 ADD cargo-config.toml /home/rust/.cargo/config
+
+RUN export USER=rust &&  cd /tmp && rm -rf t && \
+    cargo new --bin t && \
+    cd t && \
+    echo 'void = "*"' >> Cargo.toml && \
+    cat Cargo.toml && \
+    cargo build && \
+    cd /tmp && rm -rf t
 
 WORKDIR /home/rust/src
 
