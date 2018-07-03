@@ -27,9 +27,10 @@ ENV CC=/opt/cross/bin/x86_64-linux-musl-gcc
 ENV CXX=/opt/cross/bin/x86_64-linux-musl-g++
 
 # Install rust and musl target
-RUN RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup curl https://sh.rustup.rs -sSf | \
+RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
-    rustup target add x86_64-unknown-linux-musl
+    rustup target add x86_64-unknown-linux-musl && \
+    cargo install rustfmt
 # HACK: Custom linker wrapper for cargo/rustc with C++ deps
 ADD cargo-g++ /opt/cross/bin
 RUN sudo chmod +x /opt/cross/bin/cargo-g++
