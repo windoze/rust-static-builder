@@ -14,7 +14,10 @@ RUN curl https://sh.rustup.rs -sSf | \
     rustup target add x86_64-unknown-linux-musl
 # HACK: Custom linker wrapper for cargo/rustc with C++ deps
 ADD cargo-g++ /opt/cross/bin
-RUN sudo chmod +x /opt/cross/bin/cargo-g++
+# HACK: Bindgen needs to be using GNU target instead of musl, otherwise it cannot load system libclang.so
+# We install here before setting default target to musl
+RUN sudo chmod +x /opt/cross/bin/cargo-g++ && \
+    cargo install bindgen
 # Set cargo default target and parameters
 ADD cargo-config.toml /home/rust/.cargo/config
 
